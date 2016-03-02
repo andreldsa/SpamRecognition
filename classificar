@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+################################################################################
+#                                                                              #
+# Script que executa o classificador de emails usando machine learning         #
+#                                                                              #
+# Author: Andre L. Abrantes                                                    #
+#                                                                              #
+################################################################################
+
+function usage()
+{
+cat << EOF
+
+USAGE: $0 [options] <help|verbose> $1 [tecnics] <NaiveBayes|SMO> $2 train_path  $3 test_path
+
+  Script que executa um detector de spam usando machine learning!
+
+OPTIONS:
+   -h ou -help                          Mostra esta mensagem
+
+   -v ou -verbose				Verbose, mostra a classificação de cada email.
+
+TECNICS:
+   NaiveBayes					Usa o algorítmo NaiveBayes para treinar e executar os testes
+
+   SMO						Usa o algorítmo SMO para treinar e executar os testes
+   
+EOF
+}
+while true
+do
+        case "$1" in
+                -h|-help)
+                        usage
+                        exit 0
+                        shift
+                        ;;
+                -v|verbose)
+			if ! [ -e "$4" ] ; then 
+				usage 
+				exit 0 
+			fi
+			java -jar classificador.jar -v "$2" "$3" "$4"
+			exit $?
+                        shift
+                        ;;
+		SMO|NaiveBayes)
+                        if ! [ -e "$3" ] ; then 
+                                usage 
+                                exit 0 
+                        fi
+			java -jar classificador.jar "$1" "$2" "$3"
+			exit $?
+			;;
+                --)
+                        shift 
+                        break
+                        ;;
+                *)
+                        echo $OPTARG
+                        exit $?
+                        ;;
+        esac
+done
